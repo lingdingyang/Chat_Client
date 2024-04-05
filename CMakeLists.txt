@@ -31,6 +31,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         chatitem.h chatitem.cpp chatitem.ui
         chattextedit.h chattextedit.cpp
         .gitignore
+        chatcontent.h chatcontent.cpp
+        chatcontentitem.h chatcontentitem.cpp
+        Error.h
 
     )
 # Define target properties for Android with Qt 6 as:

@@ -16,9 +16,11 @@ public:
     explicit UserListItem(QWidget *parent = nullptr);
     void setName(const QString& name);
     void setTime(const QString& time);
+    QString getName();
     ~UserListItem();
 
 private:
+    QString name;
     Ui::UserListItem *ui;
 };
 
