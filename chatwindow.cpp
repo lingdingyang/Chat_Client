@@ -49,6 +49,7 @@ void ChatWindow::updateChatList()
         ui->chat_list->setItemWidget(item, widget);
         connect(widget, &ChatItem::sizeChanged, this, &ChatWindow::handleSizeChange);
     }
+    ui->chat_list->scrollToBottom();
 }
 
 // void ChatWindow::clear_name_to_content()
@@ -142,6 +143,7 @@ void ChatWindow::handle_check_user( QListWidgetItem* current,  QListWidgetItem* 
         return;
     }
     UserListItem *current_widget = (UserListItem*)ui->user_list->itemWidget(current);
+    current_widget->setNotAccept();
     QString current_name = current_widget->getName();
     if(selected_name != current_name) {
         selected_name = current_name;
@@ -166,6 +168,17 @@ void ChatWindow::handle_add_chat_item(const QString &sender, const QString &cont
     if(name_to_content.find(sender) == name_to_content.end()) {
         qDebug() << "接收到未知用户信息";
         return;
+    }
+    if(sender != selected_name) {
+        qDebug() << "loop";
+        for(int i = 0; i < ui->user_list->count(); i++) {
+            QListWidgetItem* user_list_item = ui->user_list->item(i);
+            UserListItem* user_list_item_widget = (UserListItem*)ui->user_list->itemWidget(user_list_item);
+            if(user_list_item_widget->getName() == sender) {
+                user_list_item_widget->setAccept();
+                break;
+            }
+        }
     }
     name_to_content[sender]->addContent(new ChatContentItem(content, QDateTime::currentDateTime(), this));
     updateChatList();

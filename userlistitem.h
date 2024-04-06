@@ -16,6 +16,8 @@ public:
     explicit UserListItem(QWidget *parent = nullptr);
     void setName(const QString& name);
     void setTime(const QString& time);
+    void setAccept();
+    void setNotAccept();
     QString getName();
     ~UserListItem();
 

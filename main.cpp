@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     ChatWindow c;
     MainWindow m;
-    SocketTool sock_tool(&a, "localhost", 5050);
+    SocketTool sock_tool(&a);
     m.setSocketTool(&sock_tool);
     c.setSocketTool(&sock_tool);
     c.setConnect();

@@ -2,16 +2,34 @@
 
 #include"Cmd.h"
 #include"Error.h"
-SocketTool::SocketTool(QObject *parent, const QString &ip, int port)
+void SocketTool::readN(char *addr, int len)
+{
+    int left = len;
+    int readed = 0;
+    int count;
+    while(left > 0) {
+        count = socket->read(addr + readed, left);
+        readed += count;
+        left = len - readed;
+    }
+}
+
+SocketTool::SocketTool(QObject *parent)
 {
     socket = new QTcpSocket(parent);
+}
+
+bool SocketTool::connect_to_host(const QString &ip, int port)
+{
     socket->connectToHost(ip, port);
     if( socket->waitForConnected()) {
         qDebug() << "连接完成" ;
         // login("testName");
         connect(socket, &QTcpSocket::readyRead, this, &SocketTool::handle_recv);
+        return true;
     } else {
         qDebug() << "连接失败";
+        return false;
     }
 }
 
@@ -113,11 +131,17 @@ QString SocketTool::get_user_name()
 
 void SocketTool::handle_recv()
 {
-    QByteArray res = socket->readAll();
-    QString str = QString::fromUtf8(res);
-    str = str.mid(4);
-    qDebug().noquote()  << "收到数据：" << str;
-    QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8());
+    int len;
+    readN((char*)&len, 4);
+    qDebug().noquote() << "len：" << len;
+    char* res = new char[len + 1];
+    memset(res, 0, len + 1);
+    readN(res, len);
+    QString str_res = QString(res);
+    delete[] res;
+    qDebug() << "原始数据：" << str_res;
+    qDebug().noquote()  << "收到数据：" << str_res;
+    QJsonDocument doc = QJsonDocument::fromJson(str_res.toUtf8());
     if (doc.isNull()) {
         qDebug() << "Failed to parse JSON.";
     } else if (!doc.isObject()) {
@@ -145,6 +169,11 @@ void SocketTool::handle_recv()
                 QString data = obj["data"].toString();
                 qDebug().noquote() << data;
                 emit get_user_list(data);
+            }
+        } else if(obj["op"].toInt() == OP::LOGIN) {
+            qDebug().noquote() << "收到登录返回";
+            if(obj["error"].toInt() == ERROR_CODE::NO_ERROR) {
+                qDebug().noquote() << "登陆成功";
             }
         }
     }

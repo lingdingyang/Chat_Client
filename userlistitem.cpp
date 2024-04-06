@@ -18,6 +18,16 @@ void UserListItem::setTime(const QString &time)
 {
 }
 
+void UserListItem::setAccept()
+{
+    this->ui->lab_time->setText("有新的消息");
+}
+
+void UserListItem::setNotAccept()
+{
+    this->ui->lab_time->clear();
+}
+
 QString UserListItem::getName()
 {
     return name;

@@ -25,9 +25,9 @@ MainWindow::~MainWindow()
 void MainWindow::on_btn_login_clicked()
 {
     qDebug() << "on_btn_login_clicked";
+    socket_tool ->connect_to_host(ui->lineEdit->text(), 5050);
     socket_tool->login(ui->edt_user_name->text());
     c->show();
+    socket_tool->get_list();
     this->close();
 }
-
-
