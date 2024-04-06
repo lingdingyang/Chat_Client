@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include<QModelIndex>
+#include<QDateTime>
 namespace Ui
 {
     class ChatItem;
@@ -16,6 +17,9 @@ signals:
 public:
     int totalHeight();
     explicit ChatItem( QModelIndex index, QWidget *parent = nullptr);
+    void setName(const QString& name);
+    void setTime(const QDateTime& time);
+    void setContent(const QString& content);
     ~ChatItem();
 private slots:
     void handleSizeChanged();

@@ -17,6 +17,7 @@ SocketTool::SocketTool(QObject *parent, const QString &ip, int port)
 
 bool SocketTool::login(const QString &name)
 {
+    user_name = name;
     QJsonDocument doc;
     QJsonObject obj;
     obj.insert("cmd", OP::LOGIN);
@@ -43,29 +44,31 @@ bool SocketTool::login(const QString &name)
         return false;
     }
 }
-bool SocketTool::send_msg(const QString &sender, const QString& recver, const QString &msg)
+bool SocketTool::send_msg( const QString& recver, const QString &msg)
 {
     QJsonDocument doc;
     QJsonObject obj;
     obj.insert("cmd", OP::SEND);
     obj.insert("data", msg.toUtf8().data());
-    obj.insert("sender", sender.toUtf8().data());
+    obj.insert("sender", user_name.toUtf8().data());
     obj.insert("recver", recver.toUtf8().data());
+    doc.setObject(obj);
     QByteArray array = doc.toJson(QJsonDocument::JsonFormat::Compact);
     int len = array.length();
+    // qDebug().noquote() << len << ":" << array;
     socket->write((char *)&len, 4);
     if( socket->waitForBytesWritten()) {
-        qDebug() << "发送长度成功\n";
+        qDebug() << "发送长度成功";
         socket->write(array.data(), len);
         if(socket->waitForBytesWritten()) {
-            qDebug() << "发送成功\n";
+            qDebug() << "发送成功";
             return true;
         } else {
-            qDebug() << "发送失败\n";
+            qDebug() << "发送失败";
             return false;
         }
     } else {
-        qDebug() << "发送长度失败\n";
+        qDebug() << "发送长度失败";
         return false;
     }
 }
@@ -102,6 +105,11 @@ bool SocketTool::check_login()
     return is_login;
 }
 
+QString SocketTool::get_user_name()
+{
+    return this->user_name;
+}
+
 void SocketTool::handle_recv()
 {
     QByteArray res = socket->readAll();
@@ -119,10 +127,16 @@ void SocketTool::handle_recv()
         if(obj["op"].toInt() == OP::SEND) {
             qDebug() << "接收到消息";
             if(obj["error"].toInt() == ERROR_CODE::NO_ERROR) {
+                QString sender =  obj["sender"].toString();
+                QString content = obj["data"].toString();
+                emit get_message(sender, content);
             }
         } else if(obj["op"].toInt() == OP::SEND_BACK) {
             qDebug() << "接收到发送确认";
             if(obj["error"].toInt() == ERROR_CODE::NO_ERROR) {
+                QString recver =  obj["recver"].toString();
+                QString content = obj["data"].toString();
+                emit get_message_back(recver, content);
             }
         } else if(obj["op"].toInt() == OP::LIST) {
             qDebug().noquote() << "接收到用户列表";

@@ -3,20 +3,22 @@
 
 #include <QObject>
 #include<QString>
-#include<QTime>
+#include<QDateTime>
 class ChatContentItem : public QObject
 {
     Q_OBJECT
 private:
     QString content;
-    QTime time;
+    QDateTime time;
+    bool isRecv ;
 public:
-    explicit ChatContentItem(const QString& content, const QTime& time, QObject *parent = nullptr);
+    explicit ChatContentItem(const QString& content, const QDateTime& time, QObject *parent = nullptr, bool isRecv = true);
     ChatContentItem(const ChatContentItem& c);
 
     ChatContentItem &operator=(const ChatContentItem& c);
     QString getContent() const;
-    QTime getTime()const;
+    QDateTime getTime()const;
+    bool getIsRecv()const;
 signals:
 };
 

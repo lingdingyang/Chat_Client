@@ -5,12 +5,12 @@ QString ChatContent::getName() const
     return name;
 }
 
-void ChatContent::addContent( ChatContentItem item)
+void ChatContent::addContent( ChatContentItem* item)
 {
     content_list.append(item);
 }
 
-const QList<ChatContentItem>& ChatContent::getContentList()const
+const QList<ChatContentItem*>& ChatContent::getContentList()const
 {
     return content_list;
 }
@@ -18,3 +18,8 @@ const QList<ChatContentItem>& ChatContent::getContentList()const
 ChatContent::ChatContent(QString name, QObject *parent)
     : QObject{parent}, name(name)
 {}
+
+ChatContent::~ChatContent()
+{
+    qDebug() << "~ChatContent" ;
+}

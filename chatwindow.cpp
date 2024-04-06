@@ -10,6 +10,9 @@ void ChatWindow::updateUserList()
     ui->user_list->setSpacing(3);
     this->ui->user_list->clear();
     for(const QString &name : username_list) {
+        if(name == tool->get_user_name()) {
+            continue;
+        }
         UserListItem *widget = new UserListItem(this);
         widget->setName(name);
         QListWidgetItem *item = new QListWidgetItem(ui->user_list);
@@ -23,16 +26,39 @@ void ChatWindow::updateChatList()
 {
     this->ui->chat_list->clear();
     ui->chat_list->setSelectionMode(QAbstractItemView::NoSelection);
-    for(int i = 0; i < 3; i++) {
+    if(selected_name.isEmpty()) {
+        return;
+    }
+    ChatContent* contents = name_to_content[selected_name];
+    QList<ChatContentItem*> content_list = contents->getContentList();
+    for(auto i = content_list.begin(); i != content_list.end(); ++i) {
+        QString content = (*i)->getContent();
+        QDateTime time = (*i)->getTime();
         QListWidgetItem *item = new QListWidgetItem(ui->chat_list);
         ui->chat_list->addItem(item);
         QModelIndex index = ui->chat_list->indexFromItem(item);
         ChatItem *widget = new ChatItem( index, this);
+        if((*i)->getIsRecv()) {
+            widget->setName(selected_name);
+        } else {
+            widget->setName(tool->get_user_name());
+        }
+        widget->setTime(time);
+        widget->setContent(content);
         item->setSizeHint(widget->size());
         ui->chat_list->setItemWidget(item, widget);
         connect(widget, &ChatItem::sizeChanged, this, &ChatWindow::handleSizeChange);
     }
 }
+
+// void ChatWindow::clear_name_to_content()
+// {
+//     for(auto i = name_to_content.begin(); i != name_to_content.end(); ++i) {
+//         if(*i != nullptr) {
+//             delete *i;
+//         }
+//     }
+// }
 
 void ChatWindow::handleSizeChange(const QModelIndex& index)
 {
@@ -65,6 +91,9 @@ void ChatWindow::setSocketTool(SocketTool *tool)
 void ChatWindow::setConnect()
 {
     connect(tool, &SocketTool::get_user_list, this, &ChatWindow::handle_get_user_list);
+    connect(tool, &SocketTool::get_message, this, &ChatWindow::handle_add_chat_item);
+    connect(tool, &SocketTool::get_message_back, this, &ChatWindow::handle_add_chat_item_back);
+    connect(btn_send, &QPushButton::clicked, this, &ChatWindow::handle_btn_send_clicked);
 }
 
 ChatWindow::~ChatWindow()
@@ -84,7 +113,6 @@ void ChatWindow::on_btn_update_user_list_clicked()
 
 void ChatWindow::handle_get_user_list(QString user_list)
 {
-    username_list.clear();
     qDebug().noquote() << "handle:" << user_list;
     QJsonDocument doc = QJsonDocument::fromJson(user_list.toUtf8());
     if (doc.isNull()) {
@@ -92,18 +120,27 @@ void ChatWindow::handle_get_user_list(QString user_list)
     } else if (!doc.isArray()) {
         qDebug() << "JSON is not an array.";
     } else {
+        username_list.clear();
         QJsonArray obj = doc.array();
         for(int i = 0; i < obj.count(); i++) {
-            qDebug() << obj[i].toString();
-            username_list.append(obj[i].toString());
+            QString name = obj[i].toString();
+            username_list.append(name);
         }
+        for(auto i = username_list.begin(); i != username_list.end(); ++i) {
+            if(name_to_content.find(*i) == name_to_content.end()) {
+                name_to_content[*i] = new ChatContent(*i, this);
+            }
+        }
+        updateUserList();
     }
-    updateUserList();
 }
 
 void ChatWindow::handle_check_user( QListWidgetItem* current,  QListWidgetItem* previous)
 {
     qDebug() << "handle_check_user";
+    if(current == nullptr) {
+        return;
+    }
     UserListItem *current_widget = (UserListItem*)ui->user_list->itemWidget(current);
     QString current_name = current_widget->getName();
     if(selected_name != current_name) {
@@ -120,5 +157,42 @@ void ChatWindow::handle_check_user( QListWidgetItem* current,  QListWidgetItem* 
     // } else {
     //     qDebug() << "nullptr";
     // }
+}
+
+void ChatWindow::handle_add_chat_item(const QString &sender, const QString &content)
+{
+    qDebug() << "handle_add_chat_item：";
+    qDebug() << "sender:" << sender << "content:" << content;
+    if(name_to_content.find(sender) == name_to_content.end()) {
+        qDebug() << "接收到未知用户信息";
+        return;
+    }
+    name_to_content[sender]->addContent(new ChatContentItem(content, QDateTime::currentDateTime(), this));
+    updateChatList();
+}
+
+void ChatWindow::handle_add_chat_item_back(const QString &recver, const QString &content)
+{
+    qDebug() << "handle_add_chat_item_back";
+    qDebug() << "recver:" << recver << "content:" << content;
+    if(name_to_content.find(recver) == name_to_content.end()) {
+        qDebug() << "接收到未知用户信息";
+        return;
+    }
+    name_to_content[recver]->addContent(new ChatContentItem(content, QDateTime::currentDateTime(), this, false));
+    updateChatList();
+}
+
+void ChatWindow::handle_btn_send_clicked()
+{
+    qDebug() << "handle_btn_send_clicked";
+    if(selected_name.isEmpty()) {
+        return;
+    }
+    QString input_content = ui->edit_input->toPlainText().trimmed();
+    if(input_content.isEmpty()) {
+        return;
+    }
+    tool->send_msg(selected_name, input_content);
 }
 

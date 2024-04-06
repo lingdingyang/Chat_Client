@@ -8,12 +8,13 @@ class ChatContent : public QObject
     Q_OBJECT
 private:
     QString name;
-    QList<ChatContentItem> content_list;
+    QList<ChatContentItem*> content_list;
 public:
     explicit ChatContent(QString name, QObject *parent = nullptr);
+    ~ChatContent();
     QString getName() const;
-    void addContent( ChatContentItem item);
-    const QList<ChatContentItem>& getContentList()const;
+    void addContent( ChatContentItem* item);
+    const QList<ChatContentItem*>& getContentList()const;
 
 signals:
 };

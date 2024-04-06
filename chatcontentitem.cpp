@@ -5,13 +5,18 @@ QString ChatContentItem::getContent() const
     return content;
 }
 
-QTime ChatContentItem::getTime() const
+QDateTime ChatContentItem::getTime() const
 {
     return time;
 }
 
-ChatContentItem::ChatContentItem(const QString &content, const QTime &time, QObject *parent)
-    : QObject{parent}, content(content), time(time)
+bool ChatContentItem::getIsRecv() const
+{
+    return this->isRecv;
+}
+
+ChatContentItem::ChatContentItem(const QString &content, const QDateTime &time,  QObject *parent, bool isRecv)
+    : QObject{parent}, content(content), time(time), isRecv(isRecv)
 {}
 
 ChatContentItem::ChatContentItem(const ChatContentItem &other)

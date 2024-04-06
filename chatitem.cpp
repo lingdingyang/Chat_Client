@@ -5,7 +5,7 @@
 
 int ChatItem::totalHeight()
 {
-    return ui->label->height() + ui->label_2->height() + ui->textEdit->height() + 10;
+    return ui->lab_name->height() + ui->lab_time->height() + ui->textEdit->height() + 10;
 }
 
 ChatItem::ChatItem(QModelIndex index, QWidget *parent)    : QWidget(parent)
@@ -13,6 +13,21 @@ ChatItem::ChatItem(QModelIndex index, QWidget *parent)    : QWidget(parent)
 {
     ui->setupUi(this);
     connect(ui->textEdit, &ChatTextEdit::textChanged, this, &ChatItem::handleSizeChanged);
+}
+
+void ChatItem::setName(const QString& name)
+{
+    ui->lab_name->setText(name);
+}
+
+void ChatItem::setTime(const QDateTime& time)
+{
+    ui->lab_time->setText(time.toString("yyyy-MM-dd hh-mm-ss"));
+}
+
+void ChatItem::setContent(const QString& content)
+{
+    ui->textEdit->setText(content);
 }
 
 

@@ -7,7 +7,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 }
-
 void MainWindow::setSocketTool(SocketTool *socket)
 {
     this->socket_tool = socket;
