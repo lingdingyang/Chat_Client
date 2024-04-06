@@ -8,15 +8,16 @@ SocketTool::SocketTool(QObject *parent, const QString &ip, int port)
     socket->connectToHost(ip, port);
     if( socket->waitForConnected()) {
         qDebug() << "连接完成" ;
-        login("testName");
+        // login("testName");
         connect(socket, &QTcpSocket::readyRead, this, &SocketTool::handle_recv);
     } else {
         qDebug() << "连接失败";
     }
 }
 
-bool SocketTool::login(const QString &name)
+bool SocketTool::login(const QString& name)
 {
+    qDebug() << "name:" << name;
     user_name = name;
     QJsonDocument doc;
     QJsonObject obj;

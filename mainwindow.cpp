@@ -12,6 +12,11 @@ void MainWindow::setSocketTool(SocketTool *socket)
     this->socket_tool = socket;
 }
 
+void MainWindow::setC(ChatWindow *c)
+{
+    this->c = c;
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -19,12 +24,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btn_login_clicked()
 {
+    qDebug() << "on_btn_login_clicked";
     socket_tool->login(ui->edt_user_name->text());
+    c->show();
+    this->close();
 }
 
-
-void MainWindow::on_pushButton_clicked()
-{
-    socket_tool->get_list();
-}
 

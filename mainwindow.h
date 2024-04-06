@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include"sockettool.h"
+#include"chatwindow.h"
 QT_BEGIN_NAMESPACE
 namespace Ui
 {
@@ -13,14 +14,15 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     SocketTool* socket_tool;
+    ChatWindow* c;
 public:
     MainWindow(QWidget *parent = nullptr);
     void setSocketTool(SocketTool* socket);
+    void setC(ChatWindow* c);
     ~MainWindow();
 
 private slots:
     void on_btn_login_clicked();
-    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
