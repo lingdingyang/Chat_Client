@@ -38,6 +38,6 @@ ChatItem::~ChatItem()
 
 void ChatItem::handleSizeChanged()
 {
-    qDebug() << "chat item:" << size();
+    // qDebug() << "chat item:" << size();
     emit sizeChanged(index);
 }

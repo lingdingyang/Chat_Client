@@ -170,7 +170,6 @@ void ChatWindow::handle_add_chat_item(const QString &sender, const QString &cont
         return;
     }
     if(sender != selected_name) {
-        qDebug() << "loop";
         for(int i = 0; i < ui->user_list->count(); i++) {
             QListWidgetItem* user_list_item = ui->user_list->item(i);
             UserListItem* user_list_item_widget = (UserListItem*)ui->user_list->itemWidget(user_list_item);

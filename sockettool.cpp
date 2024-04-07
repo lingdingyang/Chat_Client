@@ -159,6 +159,10 @@ void SocketTool::handle_recv()
         } else if(obj["op"].toInt() == OP::SEND_BACK) {
             qDebug() << "接收到发送确认";
             if(obj["error"].toInt() == ERROR_CODE::NO_ERROR) {
+                QString sender = obj["sender"].toString();
+                // if(sender == get_user_name()) {
+                //     return;
+                // }
                 QString recver =  obj["recver"].toString();
                 QString content = obj["data"].toString();
                 emit get_message_back(recver, content);
