@@ -5,7 +5,7 @@ void ChatTextEdit::handleChange()
 {
     QTextDocument *document = this->document();
     this->setFixedHeight(document->size().height() + 2);
-    qDebug() << document->size().height();
+    // qDebug() << document->size().height();
     emit sizeChanged();
 }
 

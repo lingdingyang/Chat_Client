@@ -10,9 +10,9 @@ void ChatWindow::updateUserList()
     ui->user_list->setSpacing(3);
     this->ui->user_list->clear();
     for(const QString &name : username_list) {
-        if(name == tool->get_user_name()) {
-            continue;
-        }
+        // if(name == tool->get_user_name()) {
+        //     continue;
+        // }
         UserListItem *widget = new UserListItem(this);
         widget->setName(name);
         QListWidgetItem *item = new QListWidgetItem(ui->user_list);
@@ -114,7 +114,7 @@ void ChatWindow::on_btn_update_user_list_clicked()
 
 void ChatWindow::handle_get_user_list(QString user_list)
 {
-    qDebug().noquote() << "handle:" << user_list;
+    qDebug().noquote() << "handle_get_user_list:" << user_list;
     QJsonDocument doc = QJsonDocument::fromJson(user_list.toUtf8());
     if (doc.isNull()) {
         qDebug() << "Failed to parse JSON.";
